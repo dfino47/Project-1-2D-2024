@@ -8,6 +8,10 @@ public class LineofSight : MonoBehaviour
        /* TODO 2.1: When the player triggers the collider, set the enemy's player reference to the player's Transform. 
         HINT: Unity has a GetComponentInParent<ComponentName>() function that searches the parent object for the ComponentName passed in.
         */
+        if(col.CompareTag("Player")){
+            GetComponentInParent<Enemy>().player = col.transform;
+        }
 
+        
     }
 }
