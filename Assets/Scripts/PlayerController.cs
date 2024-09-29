@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
     #region Movement_variables
     public float moveSpeed = 3;
+    public float sprintSpeed = 5;
+    private bool sprinting = false;
     float x_input;
     float y_input;
     #endregion
@@ -17,8 +20,9 @@ public class PlayerController : MonoBehaviour
 
     #region Health_variables
     public float maxHealth = 5;
-    float currHealth = 5;
+    public float currHealth = 5;
     public Slider hp_slider;
+    public TextMeshProUGUI hp_text;
     #endregion
 
     #region Animation_components
@@ -44,11 +48,18 @@ public class PlayerController : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.E)) {
             Interact();
         }
+        if (Input.GetKey(KeyCode.LeftShift)){
+            sprinting = true;
+        }
+        else{
+            sprinting = false;
+            // Debug.Log("Not Sprinting");
+        }
+
         /*TODO 1.1: Write an Update function that will call the Move() helper function while also updating the x_input and y_input values.
         You will also need to edit this function when you call attacks, and interacting with chests.*/
         x_input = Input.GetAxisRaw("Horizontal");
         y_input = Input.GetAxisRaw("Vertical");
-
         Move();
         /* TODO 1.2: Check if the attack key is being pressed. If so, attack by calling your Attack() function
          * IMPORTANT:  You will need to use `Input.GetKeyDown(KeyCode key)` to determine if the key is being pressed
@@ -121,19 +132,42 @@ public class PlayerController : MonoBehaviour
         /*TODO 1.1: Edit the Move() function which will set PlayerRB.velocity to a vector based on which input the player is pressing.*/
 
         if (x_input > 0) {
-            PlayerRB.velocity = Vector2.right * moveSpeed;
+            if (sprinting){
+                // Debug.Log("Velocity is: "+ PlayerRB.velocity);
+                // Debug.Log("Sprinting!~");
+                PlayerRB.velocity = Vector2.right* sprintSpeed; 
+            }
+            else {
+                PlayerRB.velocity = Vector2.right * moveSpeed;
+            }
             currDirection = Vector2.right;
+            
         }
         else if (x_input < 0) {
-            PlayerRB.velocity = Vector2.left * moveSpeed;
+            if (sprinting) {
+                PlayerRB.velocity = Vector2.left * sprintSpeed;
+            }
+            else {
+                PlayerRB.velocity = Vector2.left * moveSpeed;
+            }
             currDirection = Vector2.left;
         }
         else if (y_input > 0) {
-            PlayerRB.velocity = Vector2.up * moveSpeed;
+            if (sprinting) {
+                PlayerRB.velocity = Vector2.up * sprintSpeed;
+            }
+            else{
+                PlayerRB.velocity = Vector2.up * moveSpeed;
+            }            
             currDirection = Vector2.up;
         }
         else if (y_input < 0) {
-            PlayerRB.velocity = Vector2.down * moveSpeed;
+            if (sprinting) {
+                PlayerRB.velocity = Vector2.down * sprintSpeed;
+            }
+            else {
+                PlayerRB.velocity = Vector2.down * moveSpeed;
+            }
             currDirection = Vector2.down;
         }
         else {
@@ -161,6 +195,7 @@ public class PlayerController : MonoBehaviour
         anim.SetFloat("DirY", currDirection.y);
 
     }
+
     #endregion
 
     #region Health_functions
@@ -189,6 +224,7 @@ public class PlayerController : MonoBehaviour
         }
         currHealth += value;
         hp_slider.value = currHealth / maxHealth;
+        hp_text.text = "Max Health: " + maxHealth;
         Debug.Log("Healing! Health is now: " + currHealth);
         /* TODO 4.1: Update the value of HPSlider after the player's health changes. */
     }
